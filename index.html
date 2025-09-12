@@ -1,12 +1,202 @@
-<!DOCTYPE html>
-<html lang="en">
+<!doctype html>
+<html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <!-- redirect immediately to the new URL -->
-  <meta http-equiv="refresh" content="0;url=https://www.youtube.com/watch?v=wEVlNsjWtgI">
-  <title>Redirecting…</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>¿Esta escena está siendo modificada?</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    :root { --bg:#0b0f14; --card:#121821; --muted:#8aa0b6; --accent:#4da3ff; --border:#1f2a3a; }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji";
+      color: #e6eef7; background: radial-gradient(1200px 800px at 80% -10%, #0e1622 0%, var(--bg) 55%) fixed;
+      min-height: 100svh; display: flex; align-items: center; justify-content: center; padding: 32px;
+    }
+    .wrap { width: 100%; max-width: 820px; }
+    .card {
+      background: linear-gradient(180deg, #121821, #0f151e);
+      border: 1px solid var(--border); border-radius: 18px; padding: 22px; box-shadow: 0 20px 60px rgba(0,0,0,.35);
+    }
+    h1 {
+      font-size: clamp(22px, 3.5vw, 32px); margin: 0 0 16px; line-height: 1.2;
+      letter-spacing: 0.2px;
+    }
+    .subtitle { color: var(--muted); margin-bottom: 18px; }
+    form.add { display: flex; gap: 10px; margin: 14px 0 22px; }
+    input[type="text"] {
+      flex: 1; background: #0c1118; color: #e6eef7; border: 1px solid var(--border);
+      border-radius: 12px; padding: 12px 14px; outline: none;
+    }
+    button {
+      background: var(--accent); color: #06101d; border: none; border-radius: 12px; padding: 12px 16px;
+      font-weight: 600; cursor: pointer; transition: transform .03s ease;
+    }
+    button:active { transform: translateY(1px); }
+    ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+    .item {
+      display: grid; grid-template-columns: 1.5rem 1fr auto; align-items: center; gap: 12px;
+      background: #0b121b; border: 1px solid var(--border); border-radius: 12px; padding: 10px 12px;
+    }
+    .item label { cursor: pointer; }
+    .text { color: #dbe7f3; }
+    .text.done { color: #93a9bf; text-decoration: line-through; }
+    .del {
+      background: transparent; color: #a9bed4; border: 1px solid var(--border); padding: 8px 10px;
+    }
+    .footer {
+      margin-top: 14px; color: var(--muted); font-size: 12px; text-align: center;
+    }
+    .pill {
+      display: inline-block; background: rgba(77,163,255,.12); color: #bfe0ff; border: 1px solid rgba(77,163,255,.3);
+      padding: 4px 8px; border-radius: 999px; font-size: 12px; margin-left: 6px;
+    }
+  </style>
 </head>
 <body>
-  <p>If you’re not redirected automatically, <a href="https://www.youtube.com/watch?v=wEVlNsjWtgI">click here</a>.</p>
+  <div class="wrap">
+    <div class="card">
+      <h1>¿Esta escena está siendo modificada?<span class="pill" id="live">en vivo</span></h1>
+      <div class="subtitle">Agregá ítems, marcá/desmarcá las casillas y todos lo verán en tiempo real.</div>
+
+      <form class="add" id="add-form">
+        <input id="item-text" type="text" placeholder="Agregar nuevo ítem… (ej.: Luces, Props, Cámara)" required minlength="1" maxlength="150" />
+        <button type="submit">Agregar</button>
+      </form>
+
+      <ul id="list"></ul>
+
+      <div class="footer">
+        Datos sincronizados con Firebase Firestore. Funciona en GitHub Pages. <br>
+        <span id="status"></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Replace the config object below with your Firebase project's config (Project settings → General → Web app) -->
+  <script type="module">
+    // ----------------- Firebase init -----------------
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
+    import {
+      getFirestore, collection, addDoc, deleteDoc, doc, onSnapshot,
+      updateDoc, query, orderBy, serverTimestamp
+    } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
+    // Optional: enable anonymous auth to lock down rules later
+    // import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCylzTzmxzgq47LN_VQ0GwqdP3ATDQ_LRA",
+      authDomain: "escena-en-vivo.firebaseapp.com",
+      projectId: "escena-en-vivo",
+      storageBucket: "escena-en-vivo.firebasestorage.app",
+      messagingSenderId: "939738221248",
+      appId: "1:939738221248:web:fd4aa93b71ab97ba7f7b25"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const itemsCol = collection(db, "items");
+
+    // ----------------- DOM refs -----------------
+    const listEl = document.getElementById("list");
+    const formEl = document.getElementById("add-form");
+    const inputEl = document.getElementById("item-text");
+    const statusEl = document.getElementById("status");
+
+    // ----------------- Live query -----------------
+    // Order newest first; change to "asc" if you prefer oldest first
+    const q = query(itemsCol, orderBy("createdAt", "desc"));
+
+    onSnapshot(q, (snapshot) => {
+      // Render efficiently
+      const frag = document.createDocumentFragment();
+      snapshot.forEach((docSnap) => {
+        const data = docSnap.data();
+        const li = renderItem(docSnap.id, data.text, !!data.checked);
+        frag.appendChild(li);
+      });
+      listEl.innerHTML = "";
+      listEl.appendChild(frag);
+      statusEl.textContent = `Total: ${snapshot.size}`;
+    }, (err) => {
+      console.error(err);
+      statusEl.textContent = "Error de sincronización. Revisá la configuración de Firebase.";
+    });
+
+    // ----------------- Add item -----------------
+    formEl.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const text = inputEl.value.trim();
+      if (!text) return;
+      // Optimistic: disable while adding
+      formEl.querySelector("button").disabled = true;
+      try {
+        await addDoc(itemsCol, { text, checked: false, createdAt: serverTimestamp() });
+        inputEl.value = "";
+      } catch (e) {
+        alert("No se pudo agregar el ítem. Revisá las reglas de Firestore.");
+        console.error(e);
+      } finally {
+        formEl.querySelector("button").disabled = false;
+      }
+    });
+
+    // ----------------- Render helper -----------------
+    function renderItem(id, text, checked) {
+      const li = document.createElement("li");
+      li.className = "item";
+      li.dataset.id = id;
+
+      const cb = document.createElement("input");
+      cb.type = "checkbox";
+      cb.checked = checked;
+      cb.addEventListener("change", () => toggleChecked(id, cb.checked));
+
+      const label = document.createElement("label");
+      label.className = "text" + (checked ? " done" : "");
+      label.textContent = text;
+
+      const del = document.createElement("button");
+      del.className = "del";
+      del.textContent = "Eliminar";
+      del.addEventListener("click", () => removeItem(id));
+
+      // Update strike-through immediately on click (optimistic UI)
+      cb.addEventListener("input", () => {
+        if (cb.checked) label.classList.add("done");
+        else label.classList.remove("done");
+      });
+
+      li.appendChild(cb);
+      li.appendChild(label);
+      li.appendChild(del);
+      return li;
+    }
+
+    // ----------------- Actions -----------------
+    async function toggleChecked(id, value) {
+      try {
+        await updateDoc(doc(itemsCol, id), { checked: value });
+      } catch (e) {
+        console.error(e);
+        alert("No se pudo actualizar el estado. Revisá las reglas de Firestore.");
+      }
+    }
+
+    async function removeItem(id) {
+      if (!confirm("¿Eliminar este ítem?")) return;
+      try {
+        await deleteDoc(doc(itemsCol, id));
+      } catch (e) {
+        console.error(e);
+        alert("No se pudo eliminar. Revisá las reglas de Firestore.");
+      }
+    }
+
+    // ----------------- Optional: Anonymous auth (recommended for production rules) -----------------
+    // const auth = getAuth(app);
+    // signInAnonymously(auth).catch(console.error);
+  </script>
 </body>
 </html>
