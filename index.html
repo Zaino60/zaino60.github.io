@@ -1,202 +1,289 @@
-<!doctype html>
-<html lang="es">
+<!DOCTYPE html>
+<html lang="es-AR">
+
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>¿Esta escena está siendo modificada?</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
-  <style>
-    :root { --bg:#0b0f14; --card:#121821; --muted:#8aa0b6; --accent:#4da3ff; --border:#1f2a3a; }
-    * { box-sizing: border-box; }
-    body {
-      margin: 0; font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji";
-      color: #e6eef7; background: radial-gradient(1200px 800px at 80% -10%, #0e1622 0%, var(--bg) 55%) fixed;
-      min-height: 100svh; display: flex; align-items: center; justify-content: center; padding: 32px;
-    }
-    .wrap { width: 100%; max-width: 820px; }
-    .card {
-      background: linear-gradient(180deg, #121821, #0f151e);
-      border: 1px solid var(--border); border-radius: 18px; padding: 22px; box-shadow: 0 20px 60px rgba(0,0,0,.35);
-    }
-    h1 {
-      font-size: clamp(22px, 3.5vw, 32px); margin: 0 0 16px; line-height: 1.2;
-      letter-spacing: 0.2px;
-    }
-    .subtitle { color: var(--muted); margin-bottom: 18px; }
-    form.add { display: flex; gap: 10px; margin: 14px 0 22px; }
-    input[type="text"] {
-      flex: 1; background: #0c1118; color: #e6eef7; border: 1px solid var(--border);
-      border-radius: 12px; padding: 12px 14px; outline: none;
-    }
-    button {
-      background: var(--accent); color: #06101d; border: none; border-radius: 12px; padding: 12px 16px;
-      font-weight: 600; cursor: pointer; transition: transform .03s ease;
-    }
-    button:active { transform: translateY(1px); }
-    ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
-    .item {
-      display: grid; grid-template-columns: 1.5rem 1fr auto; align-items: center; gap: 12px;
-      background: #0b121b; border: 1px solid var(--border); border-radius: 12px; padding: 10px 12px;
-    }
-    .item label { cursor: pointer; }
-    .text { color: #dbe7f3; }
-    .text.done { color: #93a9bf; text-decoration: line-through; }
-    .del {
-      background: transparent; color: #a9bed4; border: 1px solid var(--border); padding: 8px 10px;
-    }
-    .footer {
-      margin-top: 14px; color: var(--muted); font-size: 12px; text-align: center;
-    }
-    .pill {
-      display: inline-block; background: rgba(77,163,255,.12); color: #bfe0ff; border: 1px solid rgba(77,163,255,.3);
-      padding: 4px 8px; border-radius: 999px; font-size: 12px; margin-left: 6px;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dungeon Concierge - ¡Conviértete en un Conserje de Mazmorras!</title>
+    <meta name="description"
+        content="Dungeon Concierge es un Dungeon Crawler de ritmo frenético donde tomarás el rol de un mago contratado para restaurar mazmorras.">
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        dungeon: {
+                            dark: '#1a1a1a',
+                            light: '#2d2d2d'
+                        },
+                        magic: {
+                            purple: '#7c3aed',
+                            glow: '#8b5cf6'
+                        },
+                        slime: {
+                            green: '#32CD32',
+                            hover: '#2eb82e'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    animation: {
+                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+
+    <!-- Meta Pixel Code -->
+    <script>
+        !function (f, b, e, v, n, t, s) {
+            if (f.fbq) return; n = f.fbq = function () {
+                n.callMethod ?
+                    n.callMethod.apply(n, arguments) : n.queue.push(arguments)
+            };
+            if (!f._fbq) f._fbq = n; n.push = n; n.loaded = !0; n.version = '2.0';
+            n.queue = []; t = b.createElement(e); t.async = !0;
+            t.src = v; s = b.getElementsByTagName(e)[0];
+            s.parentNode.insertBefore(t, s)
+        }(window, document, 'script',
+            'https://connect.facebook.net/en_US/fbevents.js');
+        fbq('init', '845832688254838');
+        fbq('track', 'PageView');
+    </script>
+    <noscript><img height="1" width="1" style="display:none"
+            src="https://www.facebook.com/tr?id=845832688254838&ev=PageView&noscript=1" /></noscript>
+    <!-- End Meta Pixel Code -->
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #1a1a1a;
+            color: white;
+        }
+
+        .glow-effect {
+            box-shadow: 0 0 30px rgba(124, 58, 237, 0.3);
+        }
+
+        .btn-shine {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-shine::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(to bottom right, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.1) 50%, rgba(255, 255, 255, 0) 100%);
+            transform: rotate(45deg);
+            transition: all 0.3s;
+            animation: shine 3s infinite;
+        }
+
+        @keyframes shine {
+            0% {
+                transform: translateX(-100%) rotate(45deg);
+            }
+
+            100% {
+                transform: translateX(100%) rotate(45deg);
+            }
+        }
+    </style>
 </head>
-<body>
-  <div class="wrap">
-    <div class="card">
-      <h1>¿Esta escena está siendo modificada?<span class="pill" id="live">en vivo</span></h1>
-      <div class="subtitle">Agregá ítems, marcá/desmarcá las casillas y todos lo verán en tiempo real.</div>
 
-      <form class="add" id="add-form">
-        <input id="item-text" type="text" placeholder="Agregar nuevo ítem… (ej.: Luces, Props, Cámara)" required minlength="1" maxlength="150" />
-        <button type="submit">Agregar</button>
-      </form>
+<body class="min-h-screen flex flex-col">
 
-      <ul id="list"></ul>
+    <!-- Header -->
+    <header class="w-full py-16 px-4 text-center relative overflow-hidden">
+        <!-- Background Image overlay -->
+        <div class="absolute inset-0 z-0">
+            <img src="./images/banner.png" class="w-full h-full object-cover opacity-40 blur-sm"
+                alt="Dungeon Background">
+            <div class="absolute inset-0 bg-gradient-to-b from-dungeon-dark/80 via-dungeon-dark/60 to-dungeon-dark">
+            </div>
+        </div>
 
-      <div class="footer">
-        Datos sincronizados con Firebase Firestore. Funciona en GitHub Pages. <br>
-        <span id="status"></span>
-      </div>
-    </div>
-  </div>
+        <div class="relative z-10">
+            <img src="./images/logo.png" alt="Dungeon Concierge Logo"
+                class="h-48 md:h-64 mx-auto mb-8 object-contain drop-shadow-[0_0_15px_rgba(124,58,237,0.5)]">
 
-  <!-- Replace the config object below with your Firebase project's config (Project settings → General → Web app) -->
-  <script type="module">
-    // ----------------- Firebase init -----------------
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
-    import {
-      getFirestore, collection, addDoc, deleteDoc, doc, onSnapshot,
-      updateDoc, query, orderBy, serverTimestamp
-    } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
-    // Optional: enable anonymous auth to lock down rules later
-    // import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js";
+            <h1 class="text-3xl md:text-5xl font-extrabold mb-4 text-white tracking-tight drop-shadow-lg">
+                ¡Conviértete en un <span class="text-magic-purple">Conserje de Mazmorras!</span>
+            </h1>
+            <p
+                class="text-lg md:text-xl text-gray-200 max-w-3xl mx-auto leading-relaxed font-semibold drop-shadow-md px-4">
+                Dungeon Concierge es un Dungeon Crawler de ritmo frenético donde tomarás el rol de un mago contratado
+                por una empresa de bajo presupuesto para restaurar mazmorras y dejarlas listas para la próxima tanda de
+                aventureros, usando tus poderes mágicos y el entorno a tu favor.
+            </p>
+        </div>
+    </header>
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyCylzTzmxzgq47LN_VQ0GwqdP3ATDQ_LRA",
-      authDomain: "escena-en-vivo.firebaseapp.com",
-      projectId: "escena-en-vivo",
-      storageBucket: "escena-en-vivo.firebasestorage.app",
-      messagingSenderId: "939738221248",
-      appId: "1:939738221248:web:fd4aa93b71ab97ba7f7b25"
-    };
+    <!-- Main Content -->
+    <main class="flex-grow container mx-auto px-4 py-8 flex flex-col items-center gap-12">
 
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-    const itemsCol = collection(db, "items");
+        <!-- Hero Media -->
+        <div
+            class="w-full max-w-4xl aspect-video rounded-xl overflow-hidden glow-effect border-2 border-magic-purple/30 bg-black">
+            <iframe class="w-full h-full" src="https://www.youtube.com/embed/ekcFsRENhik?rel=0"
+                title="Dungeon Concierge Trailer" frameborder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowfullscreen referrerpolicy="strict-origin-when-cross-origin">
+            </iframe>
+        </div>
 
-    // ----------------- DOM refs -----------------
-    const listEl = document.getElementById("list");
-    const formEl = document.getElementById("add-form");
-    const inputEl = document.getElementById("item-text");
-    const statusEl = document.getElementById("status");
+        <!-- Primary CTA -->
+        <div class="text-center w-full">
+            <button onclick="handleConversion()"
+                class="btn-shine bg-slime-green hover:bg-slime-hover text-dungeon-dark font-black text-2xl md:text-4xl py-6 px-12 rounded-lg transform hover:scale-105 transition-all duration-200 shadow-[0_0_20px_rgba(50,205,50,0.5)] animate-pulse-slow w-full md:w-auto uppercase tracking-wider">
+                <i class="fab fa-steam mr-3"></i> WISHLIST EN STEAM
+            </button>
+            <p class="mt-4 text-sm text-gray-500">Próximamente en PC</p>
+        </div>
 
-    // ----------------- Live query -----------------
-    // Order newest first; change to "asc" if you prefer oldest first
-    const q = query(itemsCol, orderBy("createdAt", "desc"));
+        <!-- Features Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 w-full max-w-6xl mt-8">
+            <!-- Feature 1 -->
+            <div
+                class="bg-dungeon-light/50 p-8 rounded-xl border border-gray-700 hover:border-magic-purple transition-colors text-center group backdrop-blur-sm">
+                <div
+                    class="bg-dungeon-dark w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-magic-purple/20 transition-colors">
+                    <i class="fas fa-hammer text-3xl text-magic-purple"></i>
+                </div>
+                <h3 class="text-xl font-bold mb-2 text-white">¡NO eres el héroe!</h3>
+                <p class="text-gray-400">Prepararás mazmorras en lugar de saquearlas, llenarás cofres en vez de
+                    vaciarlos ¡y hasta colocarás enemigos en lugar de eliminarlos!</p>
+            </div>
 
-    onSnapshot(q, (snapshot) => {
-      // Render efficiently
-      const frag = document.createDocumentFragment();
-      snapshot.forEach((docSnap) => {
-        const data = docSnap.data();
-        const li = renderItem(docSnap.id, data.text, !!data.checked);
-        frag.appendChild(li);
-      });
-      listEl.innerHTML = "";
-      listEl.appendChild(frag);
-      statusEl.textContent = `Total: ${snapshot.size}`;
-    }, (err) => {
-      console.error(err);
-      statusEl.textContent = "Error de sincronización. Revisá la configuración de Firebase.";
-    });
+            <!-- Feature 2 -->
+            <div
+                class="bg-dungeon-light/50 p-8 rounded-xl border border-gray-700 hover:border-magic-purple transition-colors text-center group backdrop-blur-sm">
+                <div
+                    class="bg-dungeon-dark w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-magic-purple/20 transition-colors">
+                    <i class="fas fa-broom text-3xl text-magic-purple"></i>
+                </div>
+                <h3 class="text-xl font-bold mb-2 text-white">¡No ensucies!</h3>
+                <p class="text-gray-400">Los enemigos dejan restos. ¡Tendrás que limpiarlos si juegas a ser el héroe!
+                    Aprovecha las trampas y abismos para deshacerte de ellos.</p>
+            </div>
 
-    // ----------------- Add item -----------------
-    formEl.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const text = inputEl.value.trim();
-      if (!text) return;
-      // Optimistic: disable while adding
-      formEl.querySelector("button").disabled = true;
-      try {
-        await addDoc(itemsCol, { text, checked: false, createdAt: serverTimestamp() });
-        inputEl.value = "";
-      } catch (e) {
-        alert("No se pudo agregar el ítem. Revisá las reglas de Firestore.");
-        console.error(e);
-      } finally {
-        formEl.querySelector("button").disabled = false;
-      }
-    });
+            <!-- Feature 3 -->
+            <div
+                class="bg-dungeon-light/50 p-8 rounded-xl border border-gray-700 hover:border-magic-purple transition-colors text-center group backdrop-blur-sm">
+                <div
+                    class="bg-dungeon-dark w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-magic-purple/20 transition-colors">
+                    <i class="fas fa-hat-wizard text-3xl text-magic-purple"></i>
+                </div>
+                <h3 class="text-xl font-bold mb-2 text-white">¡Eres un conserje Y un mago!</h3>
+                <p class="text-gray-400">La escoba está bien pero tu magia es más efectiva. Combinar hechizos genera
+                    sinergias poderosas. ¡Ponte creativo!</p>
+            </div>
+        </div>
 
-    // ----------------- Render helper -----------------
-    function renderItem(id, text, checked) {
-      const li = document.createElement("li");
-      li.className = "item";
-      li.dataset.id = id;
+        <!-- Gameplay Gallery -->
+        <div class="w-full max-w-6xl mt-12">
+            <h2 class="text-3xl font-bold text-center mb-10">¡Escapa o muere!</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <img src="./images/cleaning.png" alt="Cleaning Mechanic"
+                    class="rounded-lg shadow-lg hover:scale-[1.02] transition-transform duration-300 border border-gray-800">
+                <img src="./images/spells.png" alt="Spell Combinations"
+                    class="rounded-lg shadow-lg hover:scale-[1.02] transition-transform duration-300 border border-gray-800">
+                <img src="./images/chest.png" alt="Dungeon Gameplay"
+                    class="rounded-lg shadow-lg hover:scale-[1.02] transition-transform duration-300 border border-gray-800">
+                <img src="./images/dialogues.png" alt="Funny Dialogues"
+                    class="rounded-lg shadow-lg hover:scale-[1.02] transition-transform duration-300 border border-gray-800">
+            </div>
+        </div>
 
-      const cb = document.createElement("input");
-      cb.type = "checkbox";
-      cb.checked = checked;
-      cb.addEventListener("change", () => toggleChecked(id, cb.checked));
+        <!-- Wizard Character & Final CTA -->
+        <div class="flex flex-col md:flex-row items-center justify-center gap-8 mt-16 w-full max-w-4xl">
+            <img src="./images/wizard.png" alt="The Wizard" class="h-64 object-contain animate-pulse-slow">
+            <div class="text-center md:text-left">
+                <h3 class="text-2xl font-bold mb-4">Los verdaderos enemigos no son quienes crees.</h3>
+                <p class="text-gray-300 mb-6 leading-relaxed">
+                    Trabaja para Dungeon Masters LTD., una corporación malintencionada que monta mazmorras para que los
+                    héroes vivan sus aventuras. Como empleado, sos explotado, mal pagado y microgestionado por la muy
+                    temperamental hada mascota de la empresa.
+                </p>
+                <button onclick="handleConversion()"
+                    class="btn-shine bg-slime-green hover:bg-slime-hover text-dungeon-dark font-black text-xl py-4 px-8 rounded-lg transform hover:scale-105 transition-all duration-200 shadow-[0_0_20px_rgba(50,205,50,0.5)] uppercase tracking-wider block mx-auto md:mx-0">
+                    <i class="fab fa-steam mr-2"></i> Sumate al Equipo de Limpieza
+                </button>
+            </div>
+        </div>
 
-      const label = document.createElement("label");
-      label.className = "text" + (checked ? " done" : "");
-      label.textContent = text;
+    </main>
 
-      const del = document.createElement("button");
-      del.className = "del";
-      del.textContent = "Eliminar";
-      del.addEventListener("click", () => removeItem(id));
+    <!-- Footer -->
+    <footer class="w-full py-8 mt-12 border-t border-gray-800 text-center text-gray-500">
+        <div class="flex justify-center gap-6 mb-4">
+            <a href="#" class="hover:text-magic-purple transition-colors"><i class="fab fa-twitter text-xl"></i></a>
+            <a href="#" class="hover:text-magic-purple transition-colors"><i class="fab fa-discord text-xl"></i></a>
+            <a href="#" class="hover:text-magic-purple transition-colors"><i class="fab fa-tiktok text-xl"></i></a>
+        </div>
+        <p>&copy; 2025 Lassar Games. All rights reserved.</p>
+        <div class="mt-2 text-sm">
+            <a href="#" class="hover:text-white mr-4">Press Kit</a>
+            <a href="#" class="hover:text-white">Privacy Policy</a>
+        </div>
+    </footer>
 
-      // Update strike-through immediately on click (optimistic UI)
-      cb.addEventListener("input", () => {
-        if (cb.checked) label.classList.add("done");
-        else label.classList.remove("done");
-      });
+    <!-- Conversion Logic -->
+    <script>
+        // 1. Dynamic UTM Forwarding
+        function getSteamUrlWithUTMs() {
+            const baseUrl = "https://store.steampowered.com/app/4186490/Dungeon_Concierge/";
 
-      li.appendChild(cb);
-      li.appendChild(label);
-      li.appendChild(del);
-      return li;
-    }
+            try {
+                // Get current URL parameters
+                const currentParams = new URLSearchParams(window.location.search);
+                const steamUrl = new URL(baseUrl);
 
-    // ----------------- Actions -----------------
-    async function toggleChecked(id, value) {
-      try {
-        await updateDoc(doc(itemsCol, id), { checked: value });
-      } catch (e) {
-        console.error(e);
-        alert("No se pudo actualizar el estado. Revisá las reglas de Firestore.");
-      }
-    }
+                // Append all current params to the Steam URL
+                currentParams.forEach((value, key) => {
+                    steamUrl.searchParams.append(key, value);
+                });
 
-    async function removeItem(id) {
-      if (!confirm("¿Eliminar este ítem?")) return;
-      try {
-        await deleteDoc(doc(itemsCol, id));
-      } catch (e) {
-        console.error(e);
-        alert("No se pudo eliminar. Revisá las reglas de Firestore.");
-      }
-    }
+                return steamUrl.toString();
+            } catch (e) {
+                console.error("Error constructing URL:", e);
+                return baseUrl;
+            }
+        }
 
-    // ----------------- Optional: Anonymous auth (recommended for production rules) -----------------
-    // const auth = getAuth(app);
-    // signInAnonymously(auth).catch(console.error);
-  </script>
+        // 2. Conversion Handler
+        function handleConversion() {
+            // A. Fire Pixel Event
+            if (typeof fbq === 'function') {
+                fbq('track', 'Lead');
+                console.log("Pixel 'Lead' event fired.");
+            } else {
+                console.warn("Meta Pixel not loaded.");
+            }
+
+            // B. Wait and Redirect
+            setTimeout(() => {
+                const finalUrl = getSteamUrlWithUTMs();
+                console.log("Redirecting to:", finalUrl);
+                window.location.href = finalUrl;
+            }, 300);
+        }
+    </script>
 </body>
+
 </html>
