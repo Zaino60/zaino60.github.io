@@ -262,7 +262,21 @@
 
     <!-- Conversion Logic -->
     <script>
-        // 1. Dynamic UTM Forwarding
+        // 1. Google Ads Conversion
+        function gtag_report_conversion(url) {
+            var callback = function () {
+                if (typeof (url) != 'undefined') {
+                    window.location = url;
+                }
+            };
+            gtag('event', 'conversion', {
+                'send_to': 'AW-17805030540/B4PWCOj3sdEbEIzpjKpC',
+                'event_callback': callback
+            });
+            return false;
+        }
+
+        // 2. Dynamic UTM Forwarding
         function getSteamUrlWithUTMs() {
             const baseUrl = "https://store.steampowered.com/app/4186490?utm_source=CampanaFacebook";
 
@@ -283,8 +297,10 @@
             }
         }
 
-        // 2. Conversion Handler
+        // 3. Conversion Handler
         function handleConversion() {
+            const finalUrl = getSteamUrlWithUTMs();
+
             // A. Fire Pixel Event
             if (typeof fbq === 'function') {
                 fbq('track', 'Lead');
@@ -293,12 +309,15 @@
                 console.warn("Meta Pixel not loaded.");
             }
 
-            // B. Wait and Redirect
-            setTimeout(() => {
-                const finalUrl = getSteamUrlWithUTMs();
-                console.log("Redirecting to:", finalUrl);
+            // B. Google Ads Conversion (handles redirect)
+            // Fallback redirect in case Google Tag is blocked or takes too long
+            const fallbackTimer = setTimeout(() => {
+                console.log("Fallback redirecting to:", finalUrl);
                 window.location.href = finalUrl;
-            }, 300);
+            }, 1000);
+
+            // Trigger Google Ads conversion (which calls callback to redirect)
+            gtag_report_conversion(finalUrl);
         }
     </script>
 </body>
